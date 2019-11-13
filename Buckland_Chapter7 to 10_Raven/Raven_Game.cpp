@@ -321,6 +321,18 @@ void Raven_Game::AddRocket(Raven_Bot* shooter, Vector2D target)
   #endif
 }
 
+//------------------------------ AddGrenade --------------------------------
+void Raven_Game::AddGrenade(Raven_Bot* shooter, Vector2D target)
+{
+	Raven_Projectile* rp = new Rocket(shooter, target);
+
+	m_Projectiles.push_back(rp);
+
+#ifdef LOG_CREATIONAL_STUFF
+	debug_con << "Adding a grenade " << rp->ID() << " at pos " << rp->Pos() << "";
+#endif
+}
+
 //------------------------- AddRailGunSlug -----------------------------------
 void Raven_Game::AddRailGunSlug(Raven_Bot* shooter, Vector2D target)
 {
