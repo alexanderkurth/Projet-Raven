@@ -63,7 +63,7 @@ inline void RocketLauncher::ShootAt(Vector2D pos)
 //---------------------------- Desirability -----------------------------------
 //
 //-----------------------------------------------------------------------------
-double RocketLauncher::GetDesirability(double DistToTarget)
+double RocketLauncher::GetDesirability(double DistToTarget, double HealthStatus, double EnnemyHealthStatus)
 {
   if (m_iNumRoundsLeft == 0)
   {
@@ -74,6 +74,9 @@ double RocketLauncher::GetDesirability(double DistToTarget)
     //fuzzify distance and amount of ammo
     m_FuzzyModule.Fuzzify("DistToTarget", DistToTarget);
     m_FuzzyModule.Fuzzify("AmmoStatus", (double)m_iNumRoundsLeft);
+	//fuzzify les points de vie
+	m_FuzzyModule.Fuzzify("HealthStatus", HealthStatus);
+	m_FuzzyModule.Fuzzify("EnnemyHealthStatus", EnnemyHealthStatus);
 
     m_dLastDesirabilityScore = m_FuzzyModule.DeFuzzify("Desirability", FuzzyModule::max_av);
   }
@@ -149,6 +152,10 @@ void RocketLauncher::InitializeFuzzyModule()
   m_FuzzyModule.AddRule(FzAND(EnnemyHealth_Low, Health_Loads), VeryDesirable);
   m_FuzzyModule.AddRule(FzAND(EnnemyHealth_Low, Health_Okay), VeryDesirable);
   m_FuzzyModule.AddRule(FzAND(EnnemyHealth_Low, Health_Low), Desirable);
+
+  m_FuzzyModule.AddRule(FzAND(Health_Low, Ammo_Loads), VeryDesirable);
+  m_FuzzyModule.AddRule(FzAND(Health_Low, Ammo_Okay), VeryDesirable);
+  m_FuzzyModule.AddRule(FzAND(Health_Low, Ammo_Low), VeryDesirable);
 }
 
 

@@ -73,6 +73,10 @@ void Raven_WeaponSystem::SelectWeapon()
     //calculate the distance to the target
     double DistToTarget = Vec2DDistance(m_pOwner->Pos(), m_pOwner->GetTargetSys()->GetTarget()->Pos());
 
+	//trouve les points de vie du joueur et de l'adversaire
+	double  HealthStatus = m_pOwner->Health();
+	double EnnemyHealthStatus = m_pOwner->GetTargetSys()->GetTarget()->Health();
+
     //for each weapon in the inventory calculate its desirability given the 
     //current situation. The most desirable weapon is selected
     double BestSoFar = MinDouble;
@@ -84,7 +88,7 @@ void Raven_WeaponSystem::SelectWeapon()
       //distance to target and ammo remaining)
       if (curWeap->second)
       {
-        double score = curWeap->second->GetDesirability(DistToTarget);
+        double score = curWeap->second->GetDesirability(DistToTarget, HealthStatus, EnnemyHealthStatus);
 
         //if it is the most desirable so far select it
         if (score > BestSoFar)
