@@ -150,7 +150,7 @@ void Trigger_WeaponGiver::Render()
 				facing.Perp(),
 				Vector2D(2.5, 2.5));
 
-			gdi->BluePen();
+			gdi->PurplePen();
 			gdi->ClosedShape(m_vecGrenadeTrans);
 		}
 

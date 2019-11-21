@@ -38,15 +38,18 @@ double GetMaxRoundsBotCanCarryForWeapon(int WeaponType)
   {
   case type_rail_gun:
 
-    return script->GetDouble("RailGun_MaxRoundsCarried");
+	  return script->GetDouble("RailGun_MaxRoundsCarried"); break;
 
   case type_rocket_launcher:
 
-    return script->GetDouble("RocketLauncher_MaxRoundsCarried");
+	  return script->GetDouble("RocketLauncher_MaxRoundsCarried"); break;
 
   case type_shotgun:
 
-    return script->GetDouble("ShotGun_MaxRoundsCarried");
+	  return script->GetDouble("ShotGun_MaxRoundsCarried"); break;
+
+  case type_grenade_launcher :
+	  return script->GetDouble("GrenadeLauncher_MaxRoundsCarried"); break;
 
   default:
 
@@ -82,7 +85,8 @@ double Raven_Feature::TotalWeaponStrength(Raven_Bot* pBot)
   const double MaxRoundsForShotgun = GetMaxRoundsBotCanCarryForWeapon(type_shotgun);
   const double MaxRoundsForRailgun = GetMaxRoundsBotCanCarryForWeapon(type_rail_gun);
   const double MaxRoundsForRocketLauncher = GetMaxRoundsBotCanCarryForWeapon(type_rocket_launcher);
-  const double TotalRoundsCarryable = MaxRoundsForShotgun + MaxRoundsForRailgun + MaxRoundsForRocketLauncher;
+  const double MaxRoundsForGrenadeLauncher = GetMaxRoundsBotCanCarryForWeapon(type_grenade_launcher);
+  const double TotalRoundsCarryable = MaxRoundsForShotgun + MaxRoundsForRailgun + MaxRoundsForRocketLauncher + MaxRoundsForGrenadeLauncher;
 
   double NumSlugs      = (double)pBot->GetWeaponSys()->GetAmmoRemainingForWeapon(type_rail_gun);
   double NumCartridges = (double)pBot->GetWeaponSys()->GetAmmoRemainingForWeapon(type_shotgun);

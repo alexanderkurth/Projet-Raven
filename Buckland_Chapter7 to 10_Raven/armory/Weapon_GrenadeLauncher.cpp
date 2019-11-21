@@ -153,7 +153,7 @@ void GrenadeLauncher::Render()
 		m_pOwner->Facing().Perp(),
 		m_pOwner->Scale());
 
-	gdi->RedPen();
+	gdi->DarkGreenPen();
 
 	gdi->ClosedShape(m_vecWeaponVBTrans);
 }
