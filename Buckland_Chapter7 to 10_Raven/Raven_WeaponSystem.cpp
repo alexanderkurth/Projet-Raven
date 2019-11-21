@@ -3,7 +3,6 @@
 #include "armory/Weapon_RailGun.h"
 #include "armory/Weapon_ShotGun.h"
 #include "armory/Weapon_Blaster.h"
-#include "armory/Weapon_Grenade.h"
 #include "Raven_Bot.h"
 #include "misc/utils.h"
 #include "lua/Raven_Scriptor.h"
@@ -58,7 +57,6 @@ void Raven_WeaponSystem::Initialize()
   m_WeaponMap[type_shotgun]         = 0;
   m_WeaponMap[type_rail_gun]        = 0;
   m_WeaponMap[type_rocket_launcher] = 0;
-  m_WeaponMap[type_grenade]			= 0;
 }
 
 //-------------------------------- SelectWeapon -------------------------------
@@ -133,10 +131,6 @@ void  Raven_WeaponSystem::AddWeapon(unsigned int weapon_type)
   case type_rocket_launcher:
 
     w = new RocketLauncher(m_pOwner); break;
-
-  case type_grenade:
-
-	w = new Grenade(m_pOwner); break;
 
   }//end switch
   
