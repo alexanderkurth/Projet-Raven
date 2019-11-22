@@ -63,7 +63,7 @@ inline void GrenadeLauncher::ShootAt(Vector2D pos)
 //---------------------------- Desirability -----------------------------------
 //
 //-----------------------------------------------------------------------------
-double GrenadeLauncher::GetDesirability(double DistToTarget)
+double GrenadeLauncher::GetDesirability(double DistToTarget, double HealthStatus, double EnnemyHealthStatus)
 {
 	if (m_iNumRoundsLeft == 0)
 	{

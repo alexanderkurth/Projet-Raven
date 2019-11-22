@@ -737,7 +737,6 @@ void Raven_Game::Render()
     (*curW)->Render();
   }
 
- // gdi->TextAtPos(300, WindowHeight - 70, "Num Current Searches: " + ttos(m_pPathManager->GetNumActiveSearches()));
 
   //render a red circle around the selected bot (blue if possessed)
   if (m_pSelectedBot)

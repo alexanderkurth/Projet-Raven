@@ -31,7 +31,7 @@ Trigger_WeaponGiver::Trigger_WeaponGiver(std::ifstream& datafile) :
 	{
 		m_vecRLVB.push_back(rip[i]);
 	}
-	const int NumGrenadeVerts = 18;
+	const int NumGrenadeVerts = 12;
 	const Vector2D rip2[NumGrenadeVerts] = {
 		Vector2D(2, -1),
 		Vector2D(2, 0),
@@ -44,13 +44,7 @@ Trigger_WeaponGiver::Trigger_WeaponGiver(std::ifstream& datafile) :
 		Vector2D(-2, 1),
 		Vector2D(-2, -1),
 		Vector2D(0, -2),
-		Vector2D(1, -2),
-		Vector2D(2, -1),
-		Vector2D(1, 2),
-		Vector2D(1, -2),
-		Vector2D(0, 2),
-		Vector2D(0, -2),
-		Vector2D(-2, 1) };
+		Vector2D(1, -2) };
 
 	for (int i = 0; i < NumGrenadeVerts; ++i)
 	{
