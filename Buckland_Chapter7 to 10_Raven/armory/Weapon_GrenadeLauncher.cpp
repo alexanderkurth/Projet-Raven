@@ -21,14 +21,15 @@ GrenadeLauncher::GrenadeLauncher(Raven_Bot* owner) :
 {
 	//setup the vertex buffer
 	const int NumWeaponVerts = 8;
-	const Vector2D weapon[NumWeaponVerts] = { Vector2D(0, -3),
-		Vector2D(6, -3),
-		Vector2D(6, -1),
-		Vector2D(15, -1),
-		Vector2D(15, 1),
-		Vector2D(6, 1),
-		Vector2D(6, 3),
-		Vector2D(0, 3)
+	const Vector2D weapon[NumWeaponVerts] = { 
+Vector2D(0, -3),
+										   Vector2D(6, -3),
+										   Vector2D(6, -1),
+										   Vector2D(15, -1),
+										   Vector2D(15, 1),
+										   Vector2D(6, 1),
+										   Vector2D(6, 3),
+										   Vector2D(0, 3)
 	};
 	for (int vtx = 0; vtx < NumWeaponVerts; ++vtx)
 	{

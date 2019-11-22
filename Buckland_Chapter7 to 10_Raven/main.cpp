@@ -160,6 +160,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
 			g_pRaven->ChangeWeaponOfPossessedBot(type_grenade_launcher);
 
+
 			break;
 
          case 'X':
