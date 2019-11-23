@@ -81,6 +81,9 @@ Raven_Bot::Raven_Bot(Raven_Game* world,Vector2D pos):
                                         script->GetDouble("Bot_AimPersistance"));
 
   m_pSensoryMem = new Raven_SensoryMemory(this, script->GetDouble("Bot_MemorySpan"));
+
+  //initilize la variable fuzzy pour la précision du tir
+  InitializePrecisionFuzzy();
 }
 
 //-------------------------------- dtor ---------------------------------------
@@ -163,6 +166,75 @@ void Raven_Bot::Update()
   }
 }
 
+
+void Raven_Bot::InitializePrecisionFuzzy()
+{
+	tirFuzzy = new FuzzyModule;
+	//la calmeté du tireur
+	FuzzyVariable& Calmete = tirFuzzy->CreateFLV("Calmete");
+	FzSet& TresCalme = Calmete.AddRightShoulderSet("TresCalme", 0, 0.05, 0.10);
+	FzSet& MoyenCalme = Calmete.AddTriangularSet("MoyenCalme", 0.05, 0.10, 0.25);
+	FzSet& PeuCalme = Calmete.AddLeftShoulderSet("PeuCalme", 0.10, 0.25, 0.40);
+
+	//la distance du tireur
+	FuzzyVariable& DistToTarget = tirFuzzy->CreateFLV("DistToTarget");
+	FzSet& Target_Close = DistToTarget.AddLeftShoulderSet("Target_Close", 0, 25, 150);
+	FzSet& Target_Medium = DistToTarget.AddTriangularSet("Target_Medium", 25, 150, 300);
+	FzSet& Target_Far = DistToTarget.AddRightShoulderSet("Target_Far", 150, 300, 1000);
+
+	//la vélocité du tireur
+	FuzzyVariable& VelocitePerso = tirFuzzy->CreateFLV("VelocitePerso");
+	FzSet& TresVite = VelocitePerso.AddRightShoulderSet("TresVite", m_dMaxSpeed/2, m_dMaxSpeed, m_dMaxSpeed+1);
+	FzSet& MoyenVite = VelocitePerso.AddTriangularSet("MoyenVite", m_dMaxSpeed/4, m_dMaxSpeed/2, m_dMaxSpeed);
+	FzSet& PasVite = VelocitePerso.AddLeftShoulderSet("PasVite", 0, m_dMaxSpeed/4, m_dMaxSpeed/2);
+
+	//la visibilité du tireur
+	FuzzyVariable& VisibiliteTarget = tirFuzzy->CreateFLV("VisibiliteTarget");
+	FzSet& VisibleLongtemps = VisibiliteTarget.AddRightShoulderSet("VisibleLongtemps", 2, 5, 1000000);
+	FzSet& VisibleMoyen = VisibiliteTarget.AddTriangularSet("VisibleMoyen", 1, 2, 5);
+	FzSet& VisibleCourt = VisibiliteTarget.AddLeftShoulderSet("VisibleCourt", 0, 1, 2);
+
+	//regle pour la précision
+	//distance et vitesse
+	tirFuzzy->AddRule(FzAND(Target_Close, TresVite), MoyenCalme);
+	tirFuzzy->AddRule(FzAND(Target_Close, MoyenVite), TresCalme);
+	tirFuzzy->AddRule(FzAND(Target_Close, PasVite), TresCalme);
+
+	tirFuzzy->AddRule(FzAND(Target_Medium, TresVite), MoyenCalme);
+	tirFuzzy->AddRule(FzAND(Target_Medium, MoyenVite), MoyenCalme);
+	tirFuzzy->AddRule(FzAND(Target_Medium, PasVite), TresCalme);
+
+	tirFuzzy->AddRule(FzAND(Target_Far, TresVite), PeuCalme);
+	tirFuzzy->AddRule(FzAND(Target_Far, MoyenVite), PeuCalme);
+	tirFuzzy->AddRule(FzAND(Target_Far, PasVite), PeuCalme);
+	//distance et visibilite
+	tirFuzzy->AddRule(FzAND(Target_Close, VisibleLongtemps), TresCalme);
+	tirFuzzy->AddRule(FzAND(Target_Close, VisibleMoyen), TresCalme);
+	tirFuzzy->AddRule(FzAND(Target_Close, VisibleCourt), MoyenCalme);
+
+	tirFuzzy->AddRule(FzAND(Target_Medium, VisibleLongtemps), TresCalme);
+	tirFuzzy->AddRule(FzAND(Target_Medium, VisibleMoyen), MoyenCalme);
+	tirFuzzy->AddRule(FzAND(Target_Medium, VisibleCourt), MoyenCalme);
+
+	tirFuzzy->AddRule(FzAND(Target_Far, VisibleLongtemps), PeuCalme);
+	tirFuzzy->AddRule(FzAND(Target_Far, VisibleMoyen), PeuCalme);
+	tirFuzzy->AddRule(FzAND(Target_Far, VisibleCourt), PeuCalme);
+	//visibilité et vitesse
+	tirFuzzy->AddRule(FzAND(TresVite, VisibleLongtemps), PeuCalme);
+	tirFuzzy->AddRule(FzAND(TresVite, VisibleMoyen), PeuCalme);
+	tirFuzzy->AddRule(FzAND(TresVite, VisibleCourt), PeuCalme);
+
+	tirFuzzy->AddRule(FzAND(MoyenVite, VisibleLongtemps), TresCalme);
+	tirFuzzy->AddRule(FzAND(MoyenVite, VisibleMoyen), MoyenCalme);
+	tirFuzzy->AddRule(FzAND(MoyenVite, VisibleCourt), PeuCalme);
+
+	tirFuzzy->AddRule(FzAND(PasVite, VisibleLongtemps), TresCalme);
+	tirFuzzy->AddRule(FzAND(PasVite, VisibleMoyen), TresCalme);
+	tirFuzzy->AddRule(FzAND(PasVite, VisibleCourt), TresCalme);
+
+
+
+}
 
 //------------------------- UpdateMovement ------------------------------------
 //

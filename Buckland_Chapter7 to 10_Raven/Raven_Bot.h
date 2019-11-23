@@ -16,7 +16,7 @@
 #include "game/MovingEntity.h"
 #include "misc/utils.h"
 #include "Raven_TargetingSystem.h"
-
+#include "Fuzzy/FuzzyModule.h"
 
 class Raven_PathPlanner;
 class Raven_Steering;
@@ -37,8 +37,12 @@ class Raven_Bot : public MovingEntity
 private:
 
   enum Status{alive, dead, spawning};
+  
 
 private:
+  void     InitializePrecisionFuzzy();
+
+  FuzzyModule* tirFuzzy;
 
   //alive, dead or spawning?
   Status                             m_Status;
@@ -210,7 +214,7 @@ public:
   Raven_WeaponSystem* const          GetWeaponSys()const{return m_pWeaponSys;}
   Raven_SensoryMemory* const         GetSensoryMem()const{return m_pSensoryMem;}
 
-
+  FuzzyModule* const				GetFuzzyPrecision()const { return tirFuzzy;}
 };
 
 

@@ -13,6 +13,7 @@
 //-----------------------------------------------------------------------------
 #include <map>
 #include "2d/vector2d.h"
+#include "Fuzzy/FuzzyModule.h"
 
 class Raven_Bot;
 class Raven_Weapon;
@@ -23,13 +24,18 @@ class Raven_WeaponSystem
 {
 private:
   
+	//module fuzzy
+	//void Raven_WeaponSystem::CalculDeviation();
+	FuzzyModule  tirFuzzy;
+
   //a map of weapon instances indexed into by type
   typedef std::map<int, Raven_Weapon*>  WeaponMap;
+  
 
 private:
 
   Raven_Bot*       m_pOwner;
-
+  
   //pointers to the weapons the bot is carrying (a bot may only carry one
   //instance of each weapon)
   WeaponMap        m_WeaponMap;
@@ -61,7 +67,17 @@ private:
   //rads
   void        AddNoiseToAim(Vector2D& AimingPos)const;
 
+  void CalculDeviation() ;
+
+  //utilise les variables flous pour calculer la précision du tir
+ // FuzzyModule  tirFuzzy ;
+  void InitializePrecisionFuzzy();
+  //double GetViserFlou(double distance, double velocite, double visibilite) ;
+
+
 public:
+
+  //double GetViserFlou(double distance, double velocite, double visibilite, FuzzyModule tirFuzzy) const;
 
   Raven_WeaponSystem(Raven_Bot* owner,
                      double      ReactionTime,
