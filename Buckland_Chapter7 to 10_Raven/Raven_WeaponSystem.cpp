@@ -24,6 +24,7 @@ Raven_WeaponSystem::Raven_WeaponSystem(Raven_Bot* owner,
                                                           m_dAimPersistance(AimPersistance)
 {
   Initialize();
+  InitializePrecisionFuzzy();
 }
 
 //------------------------- dtor ----------------------------------------------
@@ -59,8 +60,78 @@ void Raven_WeaponSystem::Initialize()
   m_WeaponMap[type_rail_gun]        = 0;
   m_WeaponMap[type_rocket_launcher] = 0;
 
-  //this->InitializePrecisionFuzzy();
-  
+ 
+}
+
+void Raven_WeaponSystem::InitializePrecisionFuzzy()
+{
+	//tirFuzzy = new FuzzyModule;
+	//la calmeté du tireur
+
+	FuzzyVariable& Calmete = tirFuzzy.CreateFLV("Calmete");
+	FzSet& TresCalme = Calmete.AddLeftShoulderSet("TresCalme", 0, 0.05, 0.20);
+	FzSet& MoyenCalme = Calmete.AddTriangularSet("MoyenCalme", 0.05, 0.20, 0.35);
+	FzSet& PeuCalme = Calmete.AddRightShoulderSet("PeuCalme", 0.20, 0.35, 0.50);
+
+	//la distance du tireur
+	FuzzyVariable& DistToTarget = tirFuzzy.CreateFLV("DistToTarget");
+	FzSet& Target_Close = DistToTarget.AddLeftShoulderSet("Target_Close", 0, 25, 150);
+	FzSet& Target_Medium = DistToTarget.AddTriangularSet("Target_Medium", 25, 150, 300);
+	FzSet& Target_Far = DistToTarget.AddRightShoulderSet("Target_Far", 150, 300, 1000);
+
+	//la vélocité du tireur
+	FuzzyVariable& VelocitePerso = tirFuzzy.CreateFLV("VelocitePerso");
+	FzSet& TresVite = VelocitePerso.AddRightShoulderSet("TresVite", 0.5, 1, 10);
+	FzSet& MoyenVite = VelocitePerso.AddTriangularSet("MoyenVite", 0.25, 0.5, 1);
+	FzSet& PasVite = VelocitePerso.AddLeftShoulderSet("PasVite", 0, 0.25, 0.5);
+
+	//la visibilité du tireur
+	FuzzyVariable& VisibiliteTarget = tirFuzzy.CreateFLV("VisibiliteTarget");
+	FzSet& VisibleLongtemps = VisibiliteTarget.AddRightShoulderSet("VisibleLongtemps", 2, 5, 1000000);
+	FzSet& VisibleMoyen = VisibiliteTarget.AddTriangularSet("VisibleMoyen", 1, 2, 5);
+	FzSet& VisibleCourt = VisibiliteTarget.AddLeftShoulderSet("VisibleCourt", 0, 1, 2);
+
+	//regle pour la précision
+	//distance et vitesse
+
+	tirFuzzy.AddRule(FzAND(Target_Close, TresVite), MoyenCalme);
+	tirFuzzy.AddRule(FzAND(Target_Close, MoyenVite), TresCalme);
+	tirFuzzy.AddRule(FzAND(Target_Close, PasVite), TresCalme);
+
+	tirFuzzy.AddRule(FzAND(Target_Medium, TresVite), MoyenCalme);
+	tirFuzzy.AddRule(FzAND(Target_Medium, MoyenVite), MoyenCalme);
+	tirFuzzy.AddRule(FzAND(Target_Medium, PasVite), TresCalme);
+
+	tirFuzzy.AddRule(FzAND(Target_Far, TresVite), PeuCalme);
+	tirFuzzy.AddRule(FzAND(Target_Far, MoyenVite), PeuCalme);
+	tirFuzzy.AddRule(FzAND(Target_Far, PasVite), PeuCalme);
+	//distance et visibilite
+	tirFuzzy.AddRule(FzAND(Target_Close, VisibleLongtemps), TresCalme);
+	tirFuzzy.AddRule(FzAND(Target_Close, VisibleMoyen), TresCalme);
+	tirFuzzy.AddRule(FzAND(Target_Close, VisibleCourt), MoyenCalme);
+
+	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleLongtemps), TresCalme);
+	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleMoyen), MoyenCalme);
+	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleCourt), MoyenCalme);
+
+	tirFuzzy.AddRule(FzAND(Target_Far, VisibleLongtemps), PeuCalme);
+	tirFuzzy.AddRule(FzAND(Target_Far, VisibleMoyen), PeuCalme);
+	tirFuzzy.AddRule(FzAND(Target_Far, VisibleCourt), PeuCalme);
+	//visibilité et vitesse
+	tirFuzzy.AddRule(FzAND(TresVite, VisibleLongtemps), PeuCalme);
+	tirFuzzy.AddRule(FzAND(TresVite, VisibleMoyen), PeuCalme);
+	tirFuzzy.AddRule(FzAND(TresVite, VisibleCourt), PeuCalme);
+
+	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleLongtemps), TresCalme);
+	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleMoyen), MoyenCalme);
+	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleCourt), PeuCalme);
+
+	tirFuzzy.AddRule(FzAND(PasVite, VisibleLongtemps), TresCalme);
+	tirFuzzy.AddRule(FzAND(PasVite, VisibleMoyen), TresCalme);
+	tirFuzzy.AddRule(FzAND(PasVite, VisibleCourt), TresCalme);
+
+
+
 }
 
 //-------------------------------- SelectWeapon -------------------------------
@@ -181,7 +252,7 @@ void Raven_WeaponSystem::ChangeWeapon(unsigned int type)
 //  this method aims the bots current weapon at the target (if there is a
 //  target) and, if aimed correctly, fires a round
 //-----------------------------------------------------------------------------
-void Raven_WeaponSystem::TakeAimAndShoot()const
+void Raven_WeaponSystem::TakeAimAndShoot()
 {
   //aim the weapon only if the current target is shootable or if it has only
   //very recently gone out of view (this latter condition is to ensure the 
@@ -210,7 +281,7 @@ void Raven_WeaponSystem::TakeAimAndShoot()const
             m_dReactionTime) &&
            m_pOwner->hasLOSto(AimingPos) )
       {
-
+		//CalculDeviation();
         AddNoiseToAim(AimingPos);
         GetCurrentWeapon()->ShootAt(AimingPos);
       }
@@ -226,7 +297,7 @@ void Raven_WeaponSystem::TakeAimAndShoot()const
             m_dReactionTime) )
       {
         AddNoiseToAim(AimingPos);
-        
+
         GetCurrentWeapon()->ShootAt(AimingPos);
       }
     }
@@ -246,10 +317,10 @@ void Raven_WeaponSystem::TakeAimAndShoot()const
 //  adds a random deviation to the firing angle not greater than m_dAimAccuracy 
 //  rads
 //-----------------------------------------------------------------------------
-void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)const
+void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)
 {
   Vector2D toPos = AimingPos - m_pOwner->Pos();
-  double monAccuracy = m_dAimAccuracy;
+ /* double monAccuracy = m_dAimAccuracy;
   //monAccuracy += Raven_WeaponSystem::GetViserFlou(double(12),double(12),double(12));
   FuzzyModule* monFuzzy = m_pOwner->GetFuzzyPrecision();
   double viseFinal;
@@ -260,84 +331,25 @@ void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)const
   monFuzzy->Fuzzify("DistToTarget", distance);
   monFuzzy->Fuzzify("VelocitePerso", velocite);
   monFuzzy->Fuzzify("VisibiliteTarget", visibilite);
-  viseFinal = monFuzzy->DeFuzzify("Calme", FuzzyModule::max_av);
+  viseFinal = monFuzzy->DeFuzzify("Calme", FuzzyModule::max_av);*/
+
 
   //Vec2DRotateAroundOrigin(toPos, RandInRange(-m_dAimAccuracy, m_dAimAccuracy));
+  double viseFinal;
+  double distance = Vec2DDistance(m_pOwner->GetTargetBot()->Pos(), m_pOwner->Pos());
+  double velocite = m_pOwner->Speed();
+  double visibilite = m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible();
 
+  this->tirFuzzy.Fuzzify("DistToTarget", distance);
+  this->tirFuzzy.Fuzzify("VelocitePerso", velocite);
+  this->tirFuzzy.Fuzzify("VisibiliteTarget", visibilite);
+  viseFinal = this->tirFuzzy.DeFuzzify("Calmete", FuzzyModule::max_av);
 
   Vec2DRotateAroundOrigin(toPos, RandInRange(-viseFinal, viseFinal));
   AimingPos = (toPos + m_pOwner->Pos());
 }
 
-/*
-void Raven_WeaponSystem::InitializePrecisionFuzzy()
-{
-	//tirFuzzy = new FuzzyModule;
-	//la calmeté du tireur
-	FuzzyVariable& Calmete = tirFuzzy.CreateFLV("Calmete");
-	FzSet& TresCalme = Calmete.AddRightShoulderSet("TresCalme", 0, 0.05, 0.10);
-	FzSet& MoyenCalme = Calmete.AddTriangularSet("MoyenCalme", 0.05, 0.10, 0.25);
-	FzSet& PeuCalme = Calmete.AddLeftShoulderSet("PeuCalme", 0.10, 0.25, 0.40);
 
-	//la distance du tireur
-	FuzzyVariable& DistToTarget = tirFuzzy.CreateFLV("DistToTarget");
-	FzSet& Target_Close = DistToTarget.AddLeftShoulderSet("Target_Close", 0, 25, 150);
-	FzSet& Target_Medium = DistToTarget.AddTriangularSet("Target_Medium", 25, 150, 300);
-	FzSet& Target_Far = DistToTarget.AddRightShoulderSet("Target_Far", 150, 300, 1000);
-
-	//la vélocité du tireur
-	FuzzyVariable& VelocitePerso = tirFuzzy.CreateFLV("VelocitePerso");
-	FzSet& TresVite = VelocitePerso.AddRightShoulderSet("TresVite", 0.5, 1, 10);
-	FzSet& MoyenVite = VelocitePerso.AddTriangularSet("MoyenVite", 0.25, 0.5, 1);
-	FzSet& PasVite = VelocitePerso.AddLeftShoulderSet("PasVite", 0, 0.25, 0.5);
-
-	//la visibilité du tireur
-	FuzzyVariable& VisibiliteTarget = tirFuzzy.CreateFLV("VisibiliteTarget");
-	FzSet& VisibleLongtemps = VisibiliteTarget.AddRightShoulderSet("VisibleLongtemps", 2, 5, 1000000);
-	FzSet& VisibleMoyen = VisibiliteTarget.AddTriangularSet("VisibleMoyen", 1, 2, 5);
-	FzSet& VisibleCourt = VisibiliteTarget.AddLeftShoulderSet("VisibleCourt", 0, 1, 2);
-
-	//regle pour la précision
-	//distance et vitesse
-	tirFuzzy.AddRule(FzAND(Target_Close, TresVite), MoyenCalme);
-	tirFuzzy.AddRule(FzAND(Target_Close, MoyenVite), TresCalme);
-	tirFuzzy.AddRule(FzAND(Target_Close, PasVite), TresCalme);
-
-	tirFuzzy.AddRule(FzAND(Target_Medium, TresVite), MoyenCalme);
-	tirFuzzy.AddRule(FzAND(Target_Medium, MoyenVite), MoyenCalme);
-	tirFuzzy.AddRule(FzAND(Target_Medium, PasVite), TresCalme);
-
-	tirFuzzy.AddRule(FzAND(Target_Far, TresVite), PeuCalme);
-	tirFuzzy.AddRule(FzAND(Target_Far, MoyenVite), PeuCalme);
-	tirFuzzy.AddRule(FzAND(Target_Far, PasVite), PeuCalme);
-	//distance et visibilite
-	tirFuzzy.AddRule(FzAND(Target_Close, VisibleLongtemps), TresCalme);
-	tirFuzzy.AddRule(FzAND(Target_Close, VisibleMoyen), TresCalme);
-	tirFuzzy.AddRule(FzAND(Target_Close, VisibleCourt), MoyenCalme);
-
-	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleLongtemps), TresCalme);
-	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleMoyen), MoyenCalme);
-	tirFuzzy.AddRule(FzAND(Target_Medium, VisibleCourt), MoyenCalme);
-
-	tirFuzzy.AddRule(FzAND(Target_Far, VisibleLongtemps), PeuCalme);
-	tirFuzzy.AddRule(FzAND(Target_Far, VisibleMoyen), PeuCalme);
-	tirFuzzy.AddRule(FzAND(Target_Far, VisibleCourt), PeuCalme);
-	//visibilité et vitesse
-	tirFuzzy.AddRule(FzAND(TresVite, VisibleLongtemps), PeuCalme);
-	tirFuzzy.AddRule(FzAND(TresVite, VisibleMoyen), PeuCalme);
-	tirFuzzy.AddRule(FzAND(TresVite, VisibleCourt), PeuCalme);
-
-	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleLongtemps), TresCalme);
-	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleMoyen), MoyenCalme);
-	tirFuzzy.AddRule(FzAND(MoyenVite, VisibleCourt), PeuCalme);
-
-	tirFuzzy.AddRule(FzAND(PasVite, VisibleLongtemps), TresCalme);
-	tirFuzzy.AddRule(FzAND(PasVite, VisibleMoyen), TresCalme);
-	tirFuzzy.AddRule(FzAND(PasVite, VisibleCourt), TresCalme);
-
-
-
-}
 
 void Raven_WeaponSystem::CalculDeviation() 
 {
@@ -346,13 +358,13 @@ void Raven_WeaponSystem::CalculDeviation()
 		double velocite = m_pOwner->Speed();
 		double visibilite = m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible();
 
-		tirFuzzy.Fuzzify("DistToTarget", distance);
-		tirFuzzy.Fuzzify("VelocitePerso", velocite);
-		tirFuzzy.Fuzzify("VisibiliteTarget", visibilite);
-		viseFinal = tirFuzzy.DeFuzzify("Calme", FuzzyModule::max_av);
+		this->tirFuzzy.Fuzzify("DistToTarget", distance);
+		this->tirFuzzy.Fuzzify("VelocitePerso", velocite);
+		this->tirFuzzy.Fuzzify("VisibiliteTarget", visibilite);
+		viseFinal = this->tirFuzzy.DeFuzzify("Calmete", FuzzyModule::max_av);
 		this->m_dAimAccuracy = viseFinal;
-		//return this->m_dAimAccuracy;
-}*/
+
+}
 
 //-------------------------- PredictFuturePositionOfTarget --------------------
 //
