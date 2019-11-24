@@ -13,23 +13,31 @@
 //-----------------------------------------------------------------------------
 #include <map>
 #include "2d/vector2d.h"
+#include "Fuzzy/FuzzyModule.h"
 
 class Raven_Bot;
 class Raven_Weapon;
-
+class FuzzyModule;
 
 
 class Raven_WeaponSystem
 {
 private:
   
+	//module fuzzy
+	//void Raven_WeaponSystem::CalculDeviation();
+	//FuzzyModule  tirFuzzy;
+	void CalculDeviation() ;
   //a map of weapon instances indexed into by type
   typedef std::map<int, Raven_Weapon*>  WeaponMap;
+  
 
 private:
 
-  Raven_Bot*       m_pOwner;
+  FuzzyModule  tirFuzzy;
 
+  Raven_Bot*       m_pOwner;
+  
   //pointers to the weapons the bot is carrying (a bot may only carry one
   //instance of each weapon)
   WeaponMap        m_WeaponMap;
@@ -59,9 +67,19 @@ private:
 
   //adds a random deviation to the firing angle not greater than m_dAimAccuracy 
   //rads
-  void        AddNoiseToAim(Vector2D& AimingPos)const;
+  void        AddNoiseToAim(Vector2D& AimingPos);
+
+  //void CalculDeviation() ;
+
+  //utilise les variables flous pour calculer la précision du tir
+ // FuzzyModule  tirFuzzy ;
+  //void InitializePrecisionFuzzy();
+  //double GetViserFlou(double distance, double velocite, double visibilite) ;
+
 
 public:
+
+  //double GetViserFlou(double distance, double velocite, double visibilite, FuzzyModule tirFuzzy) const;
 
   Raven_WeaponSystem(Raven_Bot* owner,
                      double      ReactionTime,
@@ -76,7 +94,7 @@ public:
   //this method aims the bot's current weapon at the target (if there is a
   //target) and, if aimed correctly, fires a round. (Called each update-step
   //from Raven_Bot::Update)
-  void          TakeAimAndShoot()const;
+  void          TakeAimAndShoot();
 
   //this method determines the most appropriate weapon to use given the current
   //game state. (Called every n update-steps from Raven_Bot::Update)
@@ -108,6 +126,7 @@ public:
 
   void          RenderCurrentWeapon()const;
   void          RenderDesirabilities()const;
+  void InitializePrecisionFuzzy();
 };
 
 #endif

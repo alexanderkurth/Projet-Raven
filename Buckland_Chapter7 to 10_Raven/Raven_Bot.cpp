@@ -81,6 +81,7 @@ Raven_Bot::Raven_Bot(Raven_Game* world,Vector2D pos):
                                         script->GetDouble("Bot_AimPersistance"));
 
   m_pSensoryMem = new Raven_SensoryMemory(this, script->GetDouble("Bot_MemorySpan"));
+
 }
 
 //-------------------------------- dtor ---------------------------------------
@@ -162,6 +163,7 @@ void Raven_Bot::Update()
     m_pWeaponSys->TakeAimAndShoot();
   }
 }
+
 
 
 //------------------------- UpdateMovement ------------------------------------
