@@ -210,7 +210,7 @@ void  Raven_WeaponSystem::AddWeapon(unsigned int weapon_type)
 
   case type_grenade:
 
-	w = new Grenade(m_pOwner); break;
+	/*w = new Grenade(m_pOwner);*/ break;
 
   }//end switch
   
