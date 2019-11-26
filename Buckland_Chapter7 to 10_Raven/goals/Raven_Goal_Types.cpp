@@ -3,89 +3,93 @@
 
 GoalTypeToString* GoalTypeToString::Instance()
 {
-  static GoalTypeToString instance;
-  return &instance;
+	static GoalTypeToString instance;
+	return &instance;
 }
 
 std::string GoalTypeToString::Convert(int gt)
 {
-  switch(gt)
-  {
-  case goal_explore:
+	switch (gt)
+	{
+	case goal_explore:
 
-    return "explore";
+		return "explore";
 
-  case goal_think:
+	case goal_camp:
 
-    return "think";
+		return "camp and take a coffe";
 
-  case goal_arrive_at_position:
+	case goal_think:
 
-    return "arrive_at_position";
+		return "think";
 
-  case goal_seek_to_position:
+	case goal_arrive_at_position:
 
-    return "seek_to_position";
+		return "arrive_at_position";
 
-  case goal_follow_path:
+	case goal_seek_to_position:
 
-    return "follow_path";
+		return "seek_to_position";
 
-  case goal_traverse_edge:
+	case goal_follow_path:
 
-    return "traverse_edge";
+		return "follow_path";
 
-  case goal_move_to_position:
+	case goal_traverse_edge:
 
-    return "move_to_position";
+		return "traverse_edge";
 
-  case goal_get_health:
+	case goal_move_to_position:
 
-    return "get_health";
+		return "move_to_position";
 
-  case goal_get_shotgun:
+	case goal_get_health:
 
-    return "get_shotgun";
+		return "get_health";
 
-  case goal_get_railgun:
+	case goal_get_shotgun:
 
-    return "get_railgun";
+		return "get_shotgun";
 
-  case goal_get_rocket_launcher:
+	case goal_get_railgun:
 
-    return "get_rocket_launcher";
+		return "get_railgun";
 
-  case goal_wander:
+	case goal_get_rocket_launcher:
 
-    return "wander";
+		return "get_rocket_launcher";
 
-  case goal_negotiate_door:
+	case goal_wander:
 
-    return "negotiate_door";
+		return "wander";
 
-  case goal_attack_target:
+	case goal_negotiate_door:
 
-    return "attack_target";
+		return "negotiate_door";
 
-  case goal_hunt_target:
+	case goal_attack_target:
 
-    return "hunt_target";
+		return "attack_target";
 
-  case goal_strafe:
+	case goal_hunt_target:
 
-    return "strafe";
+		return "hunt_target";
 
-  case goal_adjust_range:
+	case goal_strafe:
 
-    return "adjust_range";
+		return "strafe";
 
-  case goal_say_phrase:
+	case goal_adjust_range:
 
-    return "say_phrase";
+		return "adjust_range";
 
-  default:
+	case goal_say_phrase:
 
-    return "UNKNOWN GOAL TYPE!";
+		return "say_phrase";
 
-  }//end switch
+	default:
+
+		return "UNKNOWN GOAL TYPE!";
+
+	}//end switch
 }
