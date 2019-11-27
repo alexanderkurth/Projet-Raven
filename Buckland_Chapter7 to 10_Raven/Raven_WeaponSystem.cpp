@@ -313,6 +313,7 @@ bool Raven_WeaponSystem::TakeAimAndShoot()
 		m_pOwner->RotateFacingTowardPosition(m_pOwner->Pos() + m_pOwner->Heading());
 		return false;
 	}
+	return false;
 }
 
 //---------------------------- AddNoiseToAim ----------------------------------

@@ -200,7 +200,7 @@ bool CNeuralNet::NetworkTrainingEpoch(vector<iovector>& SetIn, vector<iovector>&
 
 	//run each input pattern through the network, calculate the errors and update
 	//the weights accordingly
-	for (int vec = 0; vec < SetIn.size(); ++vec)
+	for (unsigned int vec = 0; vec < SetIn.size(); ++vec)
 	{
 		//first run this input vector through the network and retrieve the outputs
 		vector<double> outputs = Update(SetIn[vec]);
