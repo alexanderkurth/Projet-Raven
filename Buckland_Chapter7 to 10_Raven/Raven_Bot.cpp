@@ -46,6 +46,8 @@ Raven_Bot::Raven_Bot(Raven_Game* world, Vector2D pos) :
 	m_iScore(0),
 	m_Status(spawning),
 	m_bPossessed(false),
+	m_bTargetted(false), //When instanciated the bot is not set as a target
+	m_bIsLearningBot(false),
 	m_dFieldOfView(DegsToRads(script->GetDouble("Bot_FOV")))
 
 {
@@ -82,6 +84,10 @@ Raven_Bot::Raven_Bot(Raven_Game* world, Vector2D pos) :
 
 	m_pSensoryMem = new Raven_SensoryMemory(this, script->GetDouble("Bot_MemorySpan"));
 
+	//initialisation pour les données d'observation du training set
+	
+	m_vecObservation = std::vector<double>(0);
+	m_vecTarget = std::vector<double>(0);
 }
 
 //-------------------------------- dtor ---------------------------------------
@@ -160,7 +166,54 @@ void Raven_Bot::Update()
 
 		//this method aims the bot's current weapon at the current target
 		//and takes a shot if a shot is possible
-		m_pWeaponSys->TakeAimAndShoot();
+		bool haveShoot = m_pWeaponSys->TakeAimAndShoot();
+	}
+	else {
+		//sauvegarder les données pour un eventuel apprentissage / bot tirent a partir de 6 itérations
+		if (m_pTargSys->isTargetPresent()) {
+
+			m_vecObservation.clear();
+			m_vecTarget.clear();
+
+			m_vecObservation.push_back((Pos().Distance(m_pTargSys->GetTarget()->Pos())));
+			m_vecObservation.push_back(m_pTargSys->isTargetWithinFOV());
+			m_vecObservation.push_back(m_pWeaponSys->GetAmmoRemainingForWeapon(m_pWeaponSys->GetCurrentWeapon()->GetType()));
+			m_vecObservation.push_back(m_pWeaponSys->GetCurrentWeapon()->GetType());
+			m_vecObservation.push_back((Health()));
+
+			if (!shootTest) {
+				m_vecTarget.push_back(0); // La classe est négative.  Ne tire pas 
+			}
+			else {
+				m_vecTarget.push_back(1); // la classe de l'observation est positive. Il tire
+				shootTest = false;
+			}
+		}
+
+		if (m_pWorld->GetMiddleClickedOnABot()) {
+			m_pWorld->SetMiddleClickedOnABot(false);
+			std::list<Raven_Bot*> AllBots;
+			AllBots = GetWorld()->GetAllBots();
+			std::list<Raven_Bot*>::const_iterator curBot = AllBots.begin();
+
+			for (curBot; curBot != AllBots.end(); ++curBot)
+			{
+				if ((*curBot)->isTargetted()) {
+					const std::list<Raven_Bot*>& Teamatebots = GetWorld()->GetTeamateBots();
+					std::list<Raven_Bot*>::const_iterator curTeamateBot;
+					for (curTeamateBot = Teamatebots.begin(); curTeamateBot != Teamatebots.end(); ++curTeamateBot)
+					{
+						if ((*curTeamateBot)->isGettingOrder()) {
+							Dispatcher->DispatchMsg(SEND_MSG_IMMEDIATELY,
+								ID(),
+								(*curTeamateBot)->ID(),
+								Msg_KillTheTarget,
+								(*curBot));
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -277,6 +330,12 @@ bool Raven_Bot::HandleMessage(const Telegram& msg)
 		return true;
 	}
 
+	//When received, the bot will change his current target with the one given in the ExtraInfo of the message
+	case Msg_KillTheTarget:
+	{
+		GetTargetSys()->SetTarget((Raven_Bot*)msg.ExtraInfo);
+	}
+
 
 	default: return false;
 	}
@@ -387,6 +446,7 @@ void Raven_Bot::ChangeWeapon(unsigned int type)
 void Raven_Bot::FireWeapon(Vector2D pos)
 {
 	m_pWeaponSys->ShootAt(pos);
+	shootTest = true;
 }
 
 //----------------- CalculateExpectedTimeToReachPosition ----------------------
@@ -536,6 +596,27 @@ void Raven_Bot::Render()
 	{
 		gdi->TextAtPos(Pos().x - 40, Pos().y + 10, "Scr:" + std::to_string(Score()));
 	}
+
+	//Render a big pink square around this bot if he is the target
+	if (isTargetted()) {
+		gdi->PurplePen();
+
+		double   c = BRadius() * 2;
+
+		gdi->Line(Pos().x - c, Pos().y - c, Pos().x + c, Pos().y - c);
+		gdi->Line(Pos().x + c, Pos().y - c, Pos().x + c, Pos().y + c);
+		gdi->Line(Pos().x + c, Pos().y + c, Pos().x - c, Pos().y + c);
+		gdi->Line(Pos().x - c, Pos().y + c, Pos().x - c, Pos().y - c);
+	}
+
+	//Render a little green circle on the top-left of this bot if he is a Teamate Bot
+	if (isGettingOrder()) {
+		Vector2D teamBadgePosition = Pos() + Vector2D(BRadius(), -BRadius());
+		gdi->GreenPen();
+		gdi->Circle(teamBadgePosition, BRadius() * 0.2);
+	}
+
+	//Visual Detail Learning bot*/
 }
 
 //------------------------- SetUpVertexBuffer ---------------------------------

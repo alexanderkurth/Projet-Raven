@@ -25,13 +25,14 @@
 #include "game/EntityFunctionTemplates.h"
 #include "Raven_Bot.h"
 #include "navigation/pathmanager.h"
+#include "CData.h"
+#include "CNeuralNet.h"
 
 
 class BaseGameEntity;
 class Raven_Projectile;
 class Raven_Map;
 class GraveMarkers;
-
 
 
 class Raven_Game
@@ -44,9 +45,22 @@ private:
   //a list of all the bots that are inhabiting the map
   std::list<Raven_Bot*>            m_Bots;
 
+  //a list of all the Teamtebots that are inhabiting the map
+  std::list<Raven_Bot*>            m_TeamateBots;
+
   //the user may select a bot to control manually. This is a pointer to that
   //bot
   Raven_Bot*                       m_pSelectedBot;
+
+  //Turn the bool at true when the player clicks on a valid bot with his middle mouse button (mouse wheel) 
+  bool							   MiddleClickedOnABot;
+
+  //Is there a target actually 
+  bool							   isThereATarget;
+
+  //Bot that is targetted by the human player, teamate bots will attack him if he is in range
+  //bot
+  Raven_Bot* m_pTargettedBot;
   
   //this list contains any active projectiles (slugs, rockets,
   //shotgun pellets, etc)
@@ -80,6 +94,18 @@ private:
   //must be notified so that they can remove any references to that bot from
   //their memory
   void NotifyAllBotsOfRemoval(Raven_Bot* pRemovedBot)const;
+
+  CData m_TrainingSet; //jeu d'apprentissage
+
+  bool m_LancerApprentissage; // pour lancer l'apprentissage
+
+  CNeuralNet m_ModeleApprentissage;
+
+  bool AddData(vector<double>& data, vector<double>& targets);
+
+  void TrainThread();
+
+  bool m_estEntraine;
   
 public:
   
@@ -93,7 +119,9 @@ public:
   //loads an environment from a file
   bool LoadMap(const std::string& FileName); 
 
-  void AddBots(unsigned int NumBotsToAdd);
+  void AddBots(unsigned int NumBotsToAdd,bool typeBot = false);
+  void AddTeamateBots(unsigned int NumBotsToAdd);
+
   void AddRocket(Raven_Bot* shooter, Vector2D target);
   void AddRailGunSlug(Raven_Bot* shooter, Vector2D target);
   void AddShotGunPellet(Raven_Bot* shooter, Vector2D target);
@@ -144,6 +172,10 @@ public:
   //is a possessed bot, this fires the weapon, else does nothing
   void        ClickLeftMouseButton(POINTS p);
 
+  //this method is called when the user clicks the middle mouse button (mouse wheel). If there is a bot
+  //It makes him the target of the teamateBots
+  void		  ClickMiddleMouseButton(POINTS p);
+
   //when called will release any possessed bot from user control
   void        ExorciseAnyPossessedBot();
  
@@ -153,12 +185,20 @@ public:
   Raven_Bot*  PossessedBot()const{return m_pSelectedBot;}
   void        ChangeWeaponOfPossessedBot(unsigned int weapon)const;
 
+  CNeuralNet getModeleApprentissage() { return m_ModeleApprentissage; }
+
   
   const Raven_Map* const                   GetMap()const{return m_pMap;}
   Raven_Map* const                         GetMap(){return m_pMap;}
   const std::list<Raven_Bot*>&             GetAllBots()const{return m_Bots;}
+  //Return a list containing all the TeamateBots
+  const std::list<Raven_Bot*>&			   GetTeamateBots()const { return m_TeamateBots; }
   PathManager<Raven_PathPlanner>* const    GetPathManager(){return m_pPathManager;}
   int                                      GetNumBots()const{return m_Bots.size();}
+  bool									   GetMiddleClickedOnABot() { return MiddleClickedOnABot;}
+  bool									   GetIsThereATarget() { return isThereATarget; }
+
+  void									   SetMiddleClickedOnABot(bool state) { MiddleClickedOnABot = state; }
 
   
   void  TagRaven_BotsWithinViewRange(BaseGameEntity* pRaven_Bot, double range)

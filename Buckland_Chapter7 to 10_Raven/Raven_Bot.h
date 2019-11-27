@@ -17,6 +17,7 @@
 #include "misc/utils.h"
 #include "Raven_TargetingSystem.h"
 #include "Fuzzy/FuzzyModule.h"
+//#include "Raven_Game.h"
 
 class Raven_PathPlanner;
 class Raven_Steering;
@@ -34,12 +35,18 @@ class Raven_SensoryMemory;
 
 class Raven_Bot : public MovingEntity
 {
-private:
+protected:
 
 	enum Status { alive, dead, spawning };
 
+protected:
 
-private:
+	//
+	bool								shootTest;
+
+	//Is this bot a Learning bot or a normal one
+	bool								m_bIsLearningBot;
+
 	//alive, dead or spawning?
 	Status                             m_Status;
 
@@ -105,10 +112,21 @@ private:
 	//set to true when a human player takes over control of the bot
 	bool                               m_bPossessed;
 
+	//set to true if the bot is a TeamateBot (TeamateBots only attack the target)
+	bool                               m_bGettingOrder = false;
+	//set to true when the bot is targetted by the human player
+	bool                               m_bTargetted;
+
 	//a vertex buffer containing the bot's geometry
 	std::vector<Vector2D>              m_vecBotVB;
 	//the buffer for the transformed vertices
 	std::vector<Vector2D>              m_vecBotVBTrans;
+
+	//apprentissage. 
+  //donnee à enregistrer décrivant une situation de comportement de l'agent 
+	std::vector<double> m_vecObservation; //distance-target, visibilite, quantite-arme, type arme, son niveau de vie
+	std::vector<double> m_vecTarget; //classes sous forme d'un vecteur de sortie. 
+
 
 
 	//bots shouldn't be copied, only created or respawned
@@ -157,9 +175,16 @@ public:
 	bool          isAlive()const { return m_Status == alive; }
 	bool          isSpawning()const { return m_Status == spawning; }
 
+	bool          isGettingOrder()const { return m_bGettingOrder; }
+	bool          isTargetted()const { return m_bTargetted; }
+
 	void          SetSpawning() { m_Status = spawning; }
 	void          SetDead() { m_Status = dead; }
 	void          SetAlive() { m_Status = alive; }
+	// Set a bot as targetted or not
+	void		  SetTargetted(bool state) { m_bTargetted = state; }
+	// Set a bot as a TeamateBot or not
+	void		  SetGettingOrder(bool state) { m_bGettingOrder = state; }
 
 	//returns a value indicating the time in seconds it will take the bot
 	//to reach the given position at its current speed.
@@ -209,6 +234,9 @@ public:
 	Raven_Bot* const                   GetTargetBot()const { return m_pTargSys->GetTarget(); }
 	Raven_WeaponSystem* const          GetWeaponSys()const { return m_pWeaponSys; }
 	Raven_SensoryMemory* const         GetSensoryMem()const { return m_pSensoryMem; }
+
+	std::vector<double> GetDataShoot() { return m_vecObservation; }
+	std::vector<double> GetTargetShoot() { return m_vecTarget; }
 };
 
 

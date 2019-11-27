@@ -162,6 +162,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
            break;
 
+		 case 'T':
+
+			 g_pRaven->AddTeamateBots(1); break;
+
 
          case VK_UP:
 
@@ -184,6 +188,13 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
     }
     
     break;
+
+	case WM_MBUTTONDOWN:
+	{
+		g_pRaven->ClickMiddleMouseButton(MAKEPOINTS(lParam));
+	}
+
+	break;
 
    case WM_RBUTTONDOWN:
     {
@@ -217,6 +228,12 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
           g_pRaven->AddBots(1);
           
           break;
+
+	  case IDM_GAME_ADDTEAMBOT:
+
+		  g_pRaven->AddTeamateBots(1);
+
+		  break;
 
       case IDM_GAME_REMOVEBOT:
           

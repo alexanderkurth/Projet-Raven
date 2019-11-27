@@ -203,7 +203,6 @@ void Raven_Game::Update()
 			if (m_estEntraine & RandBool()) {
 				AddBots(1, true);
 			}
-
 		}
 
 		//if this bot is alive update it.

@@ -26,6 +26,17 @@
 #include "goals/Goal_Think.h"
 #include "goals/Raven_Goal_Types.h"
 
+#include "LearningBot.h"
+
+#include "Debug/DebugConsole.h"
+
+#include <thread> // pour la fonction d'apprentissage
+
+//uncomment to write object creation/deletion to debug console
+/*#define  LOG_CREATIONAL_STUFF
+#include "debug/DebugConsole.h"
+#include "misc/Stream_Utility_Functions.h";*/
+
 
 
 //uncomment to write object creation/deletion to debug console
@@ -39,10 +50,19 @@ Raven_Game::Raven_Game():m_pSelectedBot(NULL),
                          m_bRemoveABot(false),
                          m_pMap(NULL),
                          m_pPathManager(NULL),
-                         m_pGraveMarkers(NULL)
+                         m_pGraveMarkers(NULL),
+						 m_pTargettedBot(NULL),
+						 MiddleClickedOnABot(false),
+						 isThereATarget(false)
 {
   //load in the default map
   LoadMap(script->GetString("StartMap"));
+
+  // chaque début d'un nouveau jeu. ré-initilisaliser le dataset d'entrainement
+
+  m_TrainingSet = CData();
+
+  m_LancerApprentissage = false;
 }
 
 
@@ -97,6 +117,24 @@ void Raven_Game::Clear()
 
   m_pSelectedBot = NULL;
 
+
+}
+
+void Raven_Game::TrainThread() {
+
+	m_LancerApprentissage = true;
+
+	debug_con << "lancement de l'apprentissage" << "";
+
+	m_ModeleApprentissage = CNeuralNet(m_TrainingSet.GetInputNb(), m_TrainingSet.GetTargetsNb(), NUM_HIDDEN_NEURONS, LEARNING_RATE);
+	bool isTraining = m_ModeleApprentissage.Train(&m_TrainingSet);
+	debug_con << isTraining;
+
+	if (isTraining) {
+		debug_con << "Modele d'apprentissage de tir est appris" << "";
+		m_estEntraine = true;
+
+	}
 
 }
 
@@ -165,12 +203,30 @@ void Raven_Game::Update()
 
       //change its status to spawning
       (*curBot)->SetSpawning();
+
+	  //de temps en temps (une fois sur 2) créer un bot apprenant, lorqu'un un bot meurt.
+			//la fonction RandBool) rend vrai une fois sur 2.
+	  if (m_estEntraine & RandBool()) {
+		  AddBots(1, true);
+	  }
     }
 
     //if this bot is alive update it.
     else if ( (*curBot)->isAlive())
     {
       (*curBot)->Update();
+
+	  //on crée un échantillon de 200 observations. Juste assez pour ne pas s'accaparer de la mémoire...
+			// Le bot apprend dès que le joueur a fait un kill
+	  if ((m_TrainingSet.GetInputSet().size() < 200) & ((*curBot)->Score() > 0)) {
+
+		  //ajouter une observation au jeu d'entrainement seulement si le bot est controlé par un humain
+		  if ((*curBot)->isPossessed())
+		  {
+			  AddData((*curBot)->GetDataShoot(), (*curBot)->GetTargetShoot());
+			  debug_con << "la taille du training set" << m_TrainingSet.GetInputSet().size() << "";
+		  }
+	  }
     }  
   } 
 
@@ -193,6 +249,21 @@ void Raven_Game::Update()
 
     m_bRemoveABot = false;
   }
+
+  //Lancer l'apprentissage quand le jeu de données est suffisant
+	//la fonction d'apprentissage s'effectue en parallèle : thread
+
+  if ((m_TrainingSet.GetInputSet().size() >= 2) & (!m_LancerApprentissage)) {
+
+
+	  debug_con << "On passe par la" << "";
+
+	  std::thread t1(&Raven_Game::TrainThread, this);
+	  t1.detach();
+
+
+  }
+
 }
 
 
@@ -244,13 +315,21 @@ bool Raven_Game::AttemptToAddBot(Raven_Bot* pBot)
 //
 //  Adds a bot and switches on the default steering behavior
 //-----------------------------------------------------------------------------
-void Raven_Game::AddBots(unsigned int NumBotsToAdd)
+void Raven_Game::AddBots(unsigned int NumBotsToAdd, bool isLearningBot)
 { 
   while (NumBotsToAdd--)
   {
     //create a bot. (its position is irrelevant at this point because it will
     //not be rendered until it is spawned)
-    Raven_Bot* rb = new Raven_Bot(this, Vector2D());
+	Raven_Bot* rb;
+
+	if (!isLearningBot)
+		rb = new Raven_Bot(this, Vector2D());
+	else
+	{
+		rb = new LearningBot(this, Vector2D());
+		debug_con << "Instanciation d'un bot apprenant" << rb->ID() << "";
+	}
 
     //switch the default steering behaviors on
     rb->GetSteering()->WallAvoidanceOn();
@@ -266,6 +345,41 @@ void Raven_Game::AddBots(unsigned int NumBotsToAdd)
   debug_con << "Adding bot with ID " << ttos(rb->ID()) << "";
 #endif
   }
+}
+
+//-------------------------- AddTeamateBots --------------------------------------
+//
+//  Adds a Teamate Bot that won't attack anyone except the target if a bot is actually controlled 
+//  by the player, so that it can give orders to other bots (You can set a bot as a target by 
+//  clicking on him with the middle mouse button (the wheel), a big pink square around the bot
+//  will appear, telling you that he is the current target
+//-----------------------------------------------------------------------------
+
+void Raven_Game::AddTeamateBots(unsigned int NumBotsToAdd)
+{
+	while (NumBotsToAdd--)
+	{
+		//create a bot. (its position is irrelevant at this point because it will
+		//not be rendered until it is spawned)
+		Raven_Bot* rb = new Raven_Bot(this, Vector2D());
+		//Set him as a teamate of the currently possessed bot
+		rb->SetGettingOrder(true);
+
+		//switch the default steering behaviors on
+		rb->GetSteering()->WallAvoidanceOn();
+		rb->GetSteering()->SeparationOn();
+
+		m_Bots.push_back(rb);
+		m_TeamateBots.push_back(rb);
+
+		//register the bot with the entity manager
+		EntityMgr->RegisterEntity(rb);
+
+
+#ifdef LOG_CREATIONAL_STUFF
+		debug_con << "Adding bot with ID " << ttos(rb->ID()) << "";
+#endif
+	}
 }
 
 //---------------------------- NotifyAllBotsOfRemoval -------------------------
@@ -287,6 +401,24 @@ void Raven_Game::NotifyAllBotsOfRemoval(Raven_Bot* pRemovedBot)const
 
     }
 }
+
+//ajout à chaque update d'un bot des données sur son comportement
+bool Raven_Game::AddData(vector<double>& data, vector<double>& targets)
+{
+	if (data.size() > 0 && targets.size() > 0) {
+
+		if (m_TrainingSet.GetInputNb() <= 0)
+			m_TrainingSet = CData(data.size(), targets.size());
+
+		if (data.size() == m_TrainingSet.GetInputNb() && targets.size() == m_TrainingSet.GetTargetsNb()) {
+
+			m_TrainingSet.AddData(data, targets);
+			return true;
+		}
+	}
+	return false;
+}
+
 //-------------------------------RemoveBot ------------------------------------
 //
 //  removes the last bot to be added from the game
@@ -480,6 +612,44 @@ void Raven_Game::ClickLeftMouseButton(POINTS p)
   {
     m_pSelectedBot->FireWeapon(POINTStoVector(p));
   }
+}
+
+//---------------------- ClickMiddleMouseButton (Mouse Wheel) ---------------------------------
+//---------------------------------------------------------------------------------------------
+
+void Raven_Game::ClickMiddleMouseButton(POINTS p) {
+	Raven_Bot* pBot = GetBotAtPosition(POINTStoVector(p));
+
+	//if there is no selected bot just return;
+	if (!pBot && m_pTargettedBot == NULL) return;
+
+	MiddleClickedOnABot = true;
+
+	//If the clicked bot is neither possessed by the player nor a teamateBot (isGettingOrder stands for TeamateBot)
+	if (pBot && pBot != m_pTargettedBot && !pBot->isPossessed() && !pBot->isGettingOrder())
+	{
+		//If no target have been selected previously, it makes him the target
+		if (m_pTargettedBot == NULL) {
+			m_pTargettedBot = pBot;
+			m_pTargettedBot->SetTargetted(true);
+		}
+		//If a target have been selected previously, the previous bot is not the target anymore and the newly selected bot is now the target
+		else {
+			m_pTargettedBot->SetTargetted(false);
+			m_pTargettedBot = pBot;
+			m_pTargettedBot->SetTargetted(true);
+		}
+		isThereATarget = true;
+		return;
+	}
+
+	//If the clicked bot is already the target, he is not a target anymore 
+	if (pBot && !pBot->isPossessed() && !pBot->isGettingOrder())
+	{
+		m_pTargettedBot = pBot;
+		m_pTargettedBot->SetTargetted(!m_pTargettedBot->isTargetted());
+		isThereATarget = false;
+	}
 }
 
 //------------------------ GetPlayerInput -------------------------------------
