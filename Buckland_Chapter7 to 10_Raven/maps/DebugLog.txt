@@ -1,146 +1,288 @@
-Filename: Raven_DM1_asTEST.map
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Wall
-about to get type 
-Next Object to create is a Spawn Point
-about to get type 
-Next Object to create is a Spawn Point
-about to get type 
-Next Object to create is a Spawn Point
-about to get type 
-Next Object to create is a Health
-about to get type 
-Next Object to create is a Health
-about to get type 
-Next Object to create is a Health
-about to get type 
-Next Object to create is a rocket_launcher
-about to get type 
-Next Object to create is a Railgun
-about to get type 
-Next Object to create is a shotgun
-about to get type 
-Next Object to create is a shotgun
-about to get type 
-Next Object to create is a rocket_launcher
-about to get type 
-Next Object to create is a sliding_door
-about to get type 
-Next Object to create is a door_trigger
-about to get type 
-Next Object to create is a door_trigger
-building navmesh
+Filename: Raven_DM1.map
+NavGraph for Raven_DM1.map loaded okay
+Average edge length is 23.7036
+Neighborhood range set to 24.7036
+Partitioning navgraph nodes...
+Loading map...
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Wall
+Creating a Spawn Point
+Creating a Spawn Point
+Creating a Spawn Point
+Creating a Health
+Creating a Health
+Creating a Health
+Creating a rocket_launcher
+Creating a Railgun
+Creating a shotgun
+Creating a shotgun
+Creating a rocket_launcher
+Raven_DM1.map loaded okay
+Player Possesses bot 401
+Player is exorcised from bot 401
+Player Possesses bot 402
+Player Possesses bot 402
+la taille du training set1
+la taille du training set2
+On passe par la
+lancement de l'apprentissage
+1Modele d'apprentissage de tir est appris
+la taille du training set3
+la taille du training set4
+la taille du training set5
+la taille du training set6
+la taille du training set7
+la taille du training set8
+la taille du training set9
+la taille du training set10
+la taille du training set11
+la taille du training set12
+la taille du training set13
+la taille du training set14
+la taille du training set15
+la taille du training set16
+la taille du training set17
+la taille du training set18
+la taille du training set19
+la taille du training set20
+la taille du training set21
+la taille du training set22
+la taille du training set23
+la taille du training set24
+la taille du training set25
+la taille du training set26
+la taille du training set27
+la taille du training set28
+la taille du training set29
+la taille du training set30
+la taille du training set31
+la taille du training set32
+la taille du training set33
+la taille du training set34
+la taille du training set35
+la taille du training set36
+la taille du training set37
+la taille du training set38
+la taille du training set39
+la taille du training set40
+la taille du training set41
+la taille du training set42
+la taille du training set43
+la taille du training set44
+la taille du training set45
+la taille du training set46
+la taille du training set47
+la taille du training set48
+la taille du training set49
+la taille du training set50
+la taille du training set51
+la taille du training set52
+la taille du training set53
+la taille du training set54
+la taille du training set55
+la taille du training set56
+la taille du training set57
+la taille du training set58
+la taille du training set59
+la taille du training set60
+la taille du training set61
+la taille du training set62
+la taille du training set63
+la taille du training set64
+la taille du training set65
+la taille du training set66
+la taille du training set67
+la taille du training set68
+la taille du training set69
+la taille du training set70
+la taille du training set71
+la taille du training set72
+la taille du training set73
+la taille du training set74
+la taille du training set75
+la taille du training set76
+la taille du training set77
+la taille du training set78
+la taille du training set79
+la taille du training set80
+la taille du training set81
+la taille du training set82
+la taille du training set83
+la taille du training set84
+la taille du training set85
+la taille du training set86
+la taille du training set87
+la taille du training set88
+la taille du training set89
+la taille du training set90
+la taille du training set91
+la taille du training set92
+la taille du training set93
+la taille du training set94
+la taille du training set95
+la taille du training set96
+la taille du training set97
+la taille du training set98
+la taille du training set99
+la taille du training set100
+la taille du training set101
+la taille du training set102
+la taille du training set103
+la taille du training set104
+la taille du training set105
+la taille du training set106
+la taille du training set107
+la taille du training set108
+la taille du training set109
+la taille du training set110
+la taille du training set111
+la taille du training set112
+la taille du training set113
+la taille du training set114
+la taille du training set115
+la taille du training set116
+la taille du training set117
+la taille du training set118
+la taille du training set119
+la taille du training set120
+la taille du training set121
+la taille du training set122
+la taille du training set123
+la taille du training set124
+la taille du training set125
+la taille du training set126
+la taille du training set127
+la taille du training set128
+la taille du training set129
+la taille du training set130
+la taille du training set131
+la taille du training set132
+la taille du training set133
+la taille du training set134
+la taille du training set135
+la taille du training set136
+la taille du training set137
+la taille du training set138
+la taille du training set139
+la taille du training set140
+la taille du training set141
+la taille du training set142
+la taille du training set143
+la taille du training set144
+la taille du training set145
+la taille du training set146
+la taille du training set147
+la taille du training set148
+la taille du training set149
+la taille du training set150
+la taille du training set151
+la taille du training set152
+la taille du training set153
+la taille du training set154
+la taille du training set155
+la taille du training set156
+la taille du training set157
+la taille du training set158
+la taille du training set159
+la taille du training set160
+la taille du training set161
+la taille du training set162
+la taille du training set163
+la taille du training set164
+la taille du training set165
+la taille du training set166
+la taille du training set167
+la taille du training set168
+la taille du training set169
+la taille du training set170
+la taille du training set171
+la taille du training set172
+la taille du training set173
+la taille du training set174
+la taille du training set175
+la taille du training set176
+la taille du training set177
+la taille du training set178
+la taille du training set179
+la taille du training set180
+la taille du training set181
+la taille du training set182
+la taille du training set183
+la taille du training set184
+la taille du training set185
+la taille du training set186
+la taille du training set187
+la taille du training set188
+la taille du training set189
+la taille du training set190
+la taille du training set191
+la taille du training set192
+la taille du training set193
+la taille du training set194
+la taille du training set195
+la taille du training set196
+la taille du training set197
+la taille du training set198
+la taille du training set199
+la taille du training set200
+Instanciation d'un bot apprenant682
+deleting raven bot (id = 401)
+deleting raven bot (id = 402)
+deleting raven bot (id = 403)
+deleting raven bot (id = 682)
